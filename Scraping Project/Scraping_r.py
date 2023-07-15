@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import csv
 
 
-def get_urls():
+def response_from_main_page():
     url = "https://www.laufen.co.at/produkte"
     header = {'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"}
     request_site = grequests.get(url,headers=header)
@@ -12,13 +12,13 @@ def get_urls():
     return response_site
 
 def extract_category_urls():
-    soup = BeautifulSoup(get_urls().text, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
+    soup = BeautifulSoup(response_from_main_page().text, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
     urls = []
     links = soup.find_all('a', class_ = 'cta-black')
     for link in links:
         # display the actual urls
-        cat_link = 'https://www.laufen.co.at'+link.get('href')
-        urls.append(cat_link)
+        category_link = 'https://www.laufen.co.at'+link.get('href')
+        urls.append(category_link)
     return urls
 
 Data = []
@@ -53,11 +53,11 @@ def extract_product_data(url):
         #Products colors
         colors_el = sp.find_all('span',class_="color-display")
         colors = [c.get_text(strip=True).split('-')[1] for c in colors_el]
-        #Product Type
-        # type_element = soup.find('select', class_='form-control cfg-option')
-        # selected_option = type_element.find('option', selected=True)
-        # Type = value = selected_option.get_text(strip=True)
-        #Product Main Image
+        # Product Type
+        type_element = soup.find('select', class_='form-control cfg-option')
+        selected_option = type_element.find('option', selected=True)
+        Type = value = selected_option.get_text(strip=True)
+        # Product Main Image
         try:
             main_image_find = sp.find_all('img',{'data-finish':"n-finished-"+str(article_number)})[0]
         except Exception as e:

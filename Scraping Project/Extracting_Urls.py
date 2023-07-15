@@ -8,7 +8,10 @@ import logging
 
 logging.basicConfig(filename='log_file.txt', filemode='w',level=logging.INFO, format= '%(asctime)s - %(levelname)s - %(message)s - %(lineno)d')
 
-
+'''This function is for connecting webdriver of your browser. 
+You have to first instsall webdriver in your system.
+If your webdriver is in another path, you can change executable path in funtion.
+'''
 def webdriver_connection():
     try:
         service =   Service(executable_path = "/chromedriver")
@@ -18,8 +21,8 @@ def webdriver_connection():
     else:
         driver.maximize_window()
         return driver
-    
-def open_page(web_url,driver):
+
+def opening_url(web_url,driver):
     website = web_url
     try:
         driver.set_page_load_timeout(100)
@@ -38,13 +41,13 @@ def find_element_urls(driver,el_xpath):
         return ''
     else:
         return url
-    
-def extract_urls(cat_urls):
-    prod_url = []
-    for cat_url in cat_urls:
-        driver = webdriver_connection()
-        open_page(cat_url,driver)
 
+#This function is taking list of urls of each category and then return total products urls from each category.
+def extract_urls(category_urls):
+    prod_url = []
+    for cat_url in category_urls:
+        driver = webdriver_connection()
+        opening_url(cat_url,driver)
         no_of_prod_xpath = '/html/body/div[1]/section/div/div/div/div/div[6]/section/div/div[2]/div/section[3]/div[1]/div[5]/div/div/a/span[2]'
         no_of_product_el = WebDriverWait(driver, 20).until(
         EC.presence_of_element_located((By.XPATH,no_of_prod_xpath))
@@ -66,7 +69,7 @@ def extract_urls(cat_urls):
             else:
                 page_url = "https://www.laufen.co.at/produkte/"+cat_url.split('/')[-1]+"?page="+str(i)
             
-            open_page(page_url,driver)
+            opening_url(page_url,driver)
             urls = find_element_urls(driver,prod_xpath)
             for u in urls:
                 prod_url.append('https://www.laufen.co.at'+u.get_attribute('data-url'))
